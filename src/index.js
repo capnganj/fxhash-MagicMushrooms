@@ -3,6 +3,7 @@
 
 //imports
 import { Features } from './Features';
+import { Stereogram } from './Stereogram';
 import * as THREE from 'three';
 
 
@@ -18,7 +19,7 @@ window.$fxhashFeatures = {
   "Speed": feet.speed.tag,
   "Density": feet.density.tag
 };
-//console.log(window.$fxhashFeatures);
+console.log(window.$fxhashFeatures);
 //console.log(feet);
 
 //vars related to fxhash preview call
@@ -41,13 +42,13 @@ let previewed = false;
 
 
 //global vars 
-var controls, renderer, scene, camera;
+var controls, renderer, scene, camera, threeCanvas, magicCanvas;
 init();
 
 function init() {
   //scene & camera
   scene = new THREE.Scene();
-  let bc = feet.desaturateColor(feet.color.background, 1.5);
+  //let bc = feet.desaturateColor(feet.color.background, 1.5);
   //scene.background = new THREE.Color(bc.r/255, bc.g/255, bc.b/255);
 
   renderer = new THREE.WebGLRenderer( { 
@@ -58,19 +59,27 @@ function init() {
   renderer.setPixelRatio( window.devicePixelRatio );
   renderer.setSize( window.innerWidth, window.innerHeight );
   renderer.domElement.id = "hashish";
-  document.body.appendChild( renderer.domElement );
+  //document.body.appendChild( renderer.domElement );
+  threeCanvas = renderer.domElement;
 
-  camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 3, 6 );
+  //create a canvas for the magicmagic
+  magicCanvas = document.createElement("CANVAS");
+  magicCanvas.id = "magicHashish";
+  magicCanvas.width = window.innerWidth;
+  magicCanvas.height = window.innerHeight;
+  document.body.appendChild(magicCanvas);
+
+  camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 2.5, 4.5 );
   camera.position.set( 0, 0, 4 );
 
 
 
 
-  //bubble geometry
-  const b = new THREE.IcosahedronGeometry(1.5, 1);
+  //geometry
+  const b = new THREE.IcosahedronGeometry(1.5);
 
-  //phong
-  const m = new THREE.MeshDepthMaterial( { side: THREE.BackSide });
+  //material
+  const m = new THREE.MeshDepthMaterial( );
 
   const mesh = new THREE.Mesh(b, m);
   scene.add(mesh);
@@ -79,13 +88,14 @@ function init() {
 
   //set the background color 
   let bod = document.body;
-  bod.style.backgroundColor = 'white'
+  //bod.style.backgroundColor = 'white'
   //bod.style.backgroundColor = feet.desaturateColor(feet.color.background, 1.5);
 
   //set up resize listener and let it rip!
   window.addEventListener( 'resize', onWindowResize );
   //animate();
   render();
+  magicDust();
 }
 
 
@@ -130,4 +140,12 @@ function download() {
   link.download = 'AcidDrops.png';
   link.href = document.getElementById('hashish').toDataURL()
   link.click();
+}
+
+function magicDust() {
+  Stereogram.render({
+    el: 'magicHashish',
+    colors: [feet.interpolateFn(0.05), feet.interpolateFn(0.5), feet.interpolateFn(0.95)],
+    depthMapper: new Stereogram.CanvasDepthMapper(threeCanvas)
+  });
 }

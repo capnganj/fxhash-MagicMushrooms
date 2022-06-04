@@ -53,11 +53,11 @@ class Features {
     //color palette interpolation
     interpolateFn(val) {
         switch (this.color.name) {
-            case "Cool": return rgb(interpolateCool(val));
-            case "Warm": return rgb(interpolateWarm(val));
-            case "Viridis": return rgb(interpolateViridis(val));
-            case "Magma": return rgb(interpolateMagma(val));
-            case "Inferno": return rgb(interpolateInferno(val));
+            case "Cool": return rgb(interpolateCool(val)).formatHex();
+            case "Warm": return rgb(interpolateWarm(val)).formatHex();
+            case "Viridis": return rgb(interpolateViridis(val)).formatHex();
+            case "Magma": return rgb(interpolateMagma(val)).formatHex();
+            case "Inferno": return rgb(interpolateInferno(val)).formatHex();
             default:
                 return "high"
         }
@@ -141,7 +141,7 @@ class Features {
         this.color.siete = this.interpolateFn(this.map(fxrand(), 0, 1, 0.75, 1));
 
         //invert 33%
-        if (fxrand() > 0.666) {
+        if (fxrand() > 10) {
             this.color.background = this.invertColor(this.color.background);
             this.color.cero = this.invertColor(this.color.cero);
             this.color.uno = this.invertColor(this.color.uno);
