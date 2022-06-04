@@ -4,7 +4,9 @@
 //imports
 import { Features } from './Features';
 import { Stereogram } from './Stereogram';
+import { MushroomCap } from './MushroomCap';
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 
 //1) - generate fxhash features - global driving parameters
@@ -69,22 +71,36 @@ function init() {
   magicCanvas.height = window.innerHeight;
   document.body.appendChild(magicCanvas);
 
-  camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 2.5, 4.5 );
-  camera.position.set( 0, 0, 4 );
-
+  camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1.5, 4.5 );
+  camera.position.set( 0, 0.5 , 4 );
+  //controls = new OrbitControls( camera, renderer.domElement );
 
 
 
   //geometry
   const b = new THREE.IcosahedronGeometry(1.5);
 
+  const t = new THREE.TorusBufferGeometry(1, 0.5, 20, 50)
+  t.rotateX(feet.map(fxrand(), 0, 1, 0, Math.PI * 2))
+  t.rotateY(feet.map(fxrand(), 0, 1, 0, Math.PI * 2))
+  t.rotateZ(feet.map(fxrand(), 0, 1, 0, Math.PI * 2))
+
+  let f = new MushroomCap(1.5, 1).fungualBufferGeometry;
+  
+
+
+
+
   //material
   const m = new THREE.MeshDepthMaterial( );
+  const n = new THREE.MeshNormalMaterial();
 
-  const mesh = new THREE.Mesh(b, m);
+  const mesh = new THREE.Mesh(f, m);
+  mesh.position.set(1, 1, 0)
   scene.add(mesh);
 
-
+  const axis = new THREE.AxesHelper(1);
+  //scene.add(axis);
 
   //set the background color 
   let bod = document.body;

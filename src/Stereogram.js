@@ -295,6 +295,8 @@ var Stereogram = {
           height = canvas.height,
           pixelData = new Uint8Array(context.drawingBufferWidth * context.drawingBufferHeight * 4);
           context.readPixels(0, 0, context.drawingBufferWidth, context.drawingBufferHeight, context.RGBA, context.UNSIGNED_BYTE, pixelData);
+          //fixes upsidedownness
+          pixelData = pixelData.reverse();
       for (y = 0; y < height; y++) {
         depthMap[y] = new Float32Array(width);
         offset = width * y * 4;
@@ -306,6 +308,8 @@ var Stereogram = {
             depthMap[y][x] = pixelData[offset + (x * 4)] / 255;
           }
         }
+        //fixes wrong sidedness
+        depthMap[y] = depthMap[y].reverse()
       }
       return depthMap;
     }
