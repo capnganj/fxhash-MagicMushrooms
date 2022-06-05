@@ -61,15 +61,15 @@ function init() {
   renderer.setPixelRatio( window.devicePixelRatio );
   renderer.setSize( window.innerWidth, window.innerHeight );
   renderer.domElement.id = "hashish";
-  //document.body.appendChild( renderer.domElement );
+  document.body.appendChild( renderer.domElement );
   threeCanvas = renderer.domElement;
 
   //image for the depthmapper to chew on - three generates this... but did not work last night
-  // imageElement = document.createElement('img');
-  // imageElement.id = "depthImage";
-  // imageElement.width = window.innerWidth;
-  // imageElement.height = window.innerHeight;
-  //document.body.appendChild(imageElement);
+  imageElement = document.createElement('img');
+  imageElement.id = "depthImage";
+  imageElement.width = window.innerWidth;
+  imageElement.height = window.innerHeight;
+  document.body.appendChild(imageElement);
   
 
   //create a canvas for the magicmagic
@@ -127,7 +127,7 @@ function init() {
   boxer.applyMatrix4(new THREE.Matrix4().makeScale(-1,1,1));
   const boxMesh = new THREE.Mesh(boxer, m);
   boxMesh.position.set(0,1,0)
-  //scene.add(boxMesh);
+  scene.add(boxMesh);
 
   const axis = new THREE.AxesHelper(1);
   //scene.add(axis);
@@ -138,23 +138,24 @@ function init() {
   //bod.style.backgroundColor = feet.desaturateColor(feet.color.background, 1.5);
 
   //set up resize listener and let it rip!
-  window.addEventListener( 'resize', onWindowResize );
+  //window.addEventListener( 'resize', onWindowResize );
   //animate();
 
   //render the first frame
   render();
 
   //populate the image source with the data url 
-  // imageElement.src = document.getElementById('hashish').toDataURL();
-  // imageElement.onload = () => {
-  //   magicDust();
-  //   document.body.removeChild(imageElement);
-  // }
-  //document.body.removeChild( renderer.domElement );
-  // document.body.removeChild(imageElement);
+  imageElement.src = document.getElementById('hashish').toDataURL();
+  imageElement.onload = () => {
+    console.log("image load event");
+    magicDust();
+    document.body.removeChild(imageElement);
+  }
+  document.body.removeChild( renderer.domElement );
+  //document.body.removeChild(imageElement);
 
   //generate the stereogram
-  magicDust();
+  //magicDust();
   //download();
 }
 
@@ -203,10 +204,16 @@ function download() {
 }
 
 function magicDust() {
+  console.log("call stereogram")
+
+  const imgMapper = new Stereogram.ImgDepthMapper(imageElement);
+  const dm = imgMapper.generate(window.innerWidth, window.innerHeight);
+
   Stereogram.render({
     el: 'magicHashish',
     colors: [feet.interpolateFn(0.05), feet.interpolateFn(0.5), feet.interpolateFn(0.95)],
-    depthMapper: new Stereogram.CanvasDepthMapper(threeCanvas)
+    depthMap: dm
+    //depthMapper: new Stereogram.CanvasDepthMapper(threeCanvas)
     //depthMapper: new Stereogram.ImgDepthMapper(imageElement)
   });
 }

@@ -200,7 +200,7 @@ var Stereogram = {
 
   var DepthMapper = function () {};
 
-  DepthMapper.prototype.autoResize = true;
+  DepthMapper.prototype.autoResize = false;
 
   DepthMapper.prototype.make = function (width, height) {
     // !!! Overwrite this method
@@ -330,7 +330,7 @@ var Stereogram = {
       canvas.width = this.img.width;
       canvas.height = this.img.height;
       context.drawImage(this.img, 0, 0, canvas.width, canvas.height);
-      this.depthMapFromCanvas(canvas);
+      return this.depthMapFromCanvas(canvas);
     },
   
     depthMapFromCanvas: function (canvas) {
@@ -345,7 +345,7 @@ var Stereogram = {
         offset = width * y * 4;
         for (x = 0; x < width; x++) {
           // assume grayscale (R, G, and B are equal)
-          depthMap[y][x] = pixelData[offset + (x * 4)];
+          depthMap[y][x] = pixelData[offset + (x * 4)]/255;
         }
       }
       return depthMap;
