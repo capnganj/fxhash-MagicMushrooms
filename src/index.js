@@ -79,12 +79,11 @@ function init() {
   magicCanvas.height = window.innerHeight;
   document.body.appendChild(magicCanvas);
 
-  camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1.2, 6 );
+  camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1.3, 10 );
   camera.position.set( 0, 0.5, 3.1 );
-  camera.updateProjectionMatrix();
   controls = new OrbitControls( camera, renderer.domElement );
   controls.target.set(0,0.5,0)
-
+  camera.updateProjectionMatrix();
 
   //material
   const m = new THREE.MeshDepthMaterial();
@@ -95,7 +94,7 @@ function init() {
 
   //ellipse gives evenly spaced points 
   const elle = new THREE.EllipseCurve(0,0, 2.2, 1.1, 0, Math.PI*2, false, 0);
-  const numShrooms = 7;
+  const numShrooms = 13;
   const basePointsOnXY = elle.getPoints(numShrooms)
 
   for (let i = 0; i < numShrooms; i++) {
@@ -122,7 +121,7 @@ function init() {
     scene.add(stemMesh);
   }
 
-  const boxer = new THREE.BoxBufferGeometry(6,4,3.2);
+  const boxer = new THREE.BoxBufferGeometry(9,4,5.2);
   //flip normals
   boxer.applyMatrix4(new THREE.Matrix4().makeScale(-1,1,1));
   const boxMesh = new THREE.Mesh(boxer, m);
@@ -149,6 +148,7 @@ function init() {
   imageElement.onload = () => {
     console.log("image load event");
     magicDust();
+    download();
     document.body.removeChild(imageElement);
   }
   document.body.removeChild( renderer.domElement );
@@ -181,6 +181,7 @@ function animate() {
 
 function render() {
 
+  controls.update();
   renderer.render( scene, camera );
 
   //wait and see with this one...
@@ -199,7 +200,7 @@ function render() {
 function download() {
   var link = document.createElement('a');
   link.download = 'MagicMushrooms.png';
-  link.href = document.getElementById('hashish').toDataURL()
+  link.href = document.getElementById('depthImage').src
   link.click();
 }
 
