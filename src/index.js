@@ -7,10 +7,10 @@ import { Stereogram } from './Stereogram';
 import { MushroomCap } from './MushroomCap';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import p5 from 'p5';
 
 
 //1) - generate fxhash features - global driving parameters
-//new featuresClass
 let feet = new Features();
 window.$fxhashData = feet;
 
@@ -25,61 +25,61 @@ console.log(window.$fxhashFeatures);
 //console.log(feet);
 
 //vars related to fxhash preview call
-//loaded tracks whether texture has loaded;
+//loaded tracks whether everything has loaded;
 //previewed tracks whether preview has been called
 let loaded = false;
 let previewed = false;
 
-//from fxhash webpack boilerplate
-// these are the variables you can use as inputs to your algorithms
-//console.log(fxhash)   // the 64 chars hex number fed to your algorithm
-//console.log(fxrand()) // deterministic PRNG function, use it instead of Math.random()
-//console.log("fxhash features", window.$fxhashFeatures);
 
+//2) Initialize three.js scene and start the render loop (here we only call render once!)
 
-//2) Initialize three.js scene and start the render loop
-//all data driving geometry and materials and whatever else should be generated in step 2
+//global vars three and stereogram use to generate a magical canvas
+let controls, renderer, scene, camera, threeCanvas, magicCanvas, imageElement;
 
+//dimensions for stereogram image
+let magicWidth = 1200;
+let magicHeight = 742;
 
+//global processing sketch object
+let globalSK;
 
+//final image element that gets assigned to and redrawn by p5js
+let magicImage;
 
-//global vars 
-var controls, renderer, scene, camera, threeCanvas, magicCanvas, imageElement;
-init();
-
-function init() {
+//big hairy magic fungus image generation!  This runs once, and ultimately generates an image that p5js renders to a canvas and resizes
+function bootstrapMagicMushroomStereogram() {
   //scene & camera
   scene = new THREE.Scene();
-  //let bc = feet.desaturateColor(feet.color.background, 1.5);
-  //scene.background = new THREE.Color(0,0,0);
 
+  //threejs renderer
   renderer = new THREE.WebGLRenderer( { 
     antialias: true,
     alpha: true,
     preserveDrawingBuffer: true
   } );
   renderer.setPixelRatio( window.devicePixelRatio );
-  renderer.setSize( window.innerWidth, window.innerHeight );
+  renderer.setSize( magicWidth, magicHeight );
   renderer.domElement.id = "hashish";
   document.body.appendChild( renderer.domElement );
   threeCanvas = renderer.domElement;
 
-  //image for the depthmapper to chew on - three generates this... but did not work last night
+  //image for the depthmapper to chew on - three generates this, and the image depthmapper seems to work better than the webgl2 canvas mapper
   imageElement = document.createElement('img');
   imageElement.id = "depthImage";
-  imageElement.width = window.innerWidth;
-  imageElement.height = window.innerHeight;
+  imageElement.width = magicWidth;
+  imageElement.height = magicHeight;
   document.body.appendChild(imageElement);
   
-
   //create a canvas for the magicmagic
   magicCanvas = document.createElement('canvas');
   magicCanvas.id = "magicHashish";
-  magicCanvas.width = window.innerWidth;
-  magicCanvas.height = window.innerHeight;
+  magicCanvas.width = magicWidth;
+  magicCanvas.height = magicHeight;
   document.body.appendChild(magicCanvas);
 
-  camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1.3, 10 );
+
+  //threejs camera and orbitcontrols
+  camera = new THREE.PerspectiveCamera( 60, magicWidth / magicHeight, 1.3, 10 );
   camera.position.set( 0, 0.5, 3.1 );
   controls = new OrbitControls( camera, renderer.domElement );
   controls.target.set(0,0.5,0)
@@ -145,40 +145,69 @@ function init() {
 
   //populate the image source with the data url 
   imageElement.src = document.getElementById('hashish').toDataURL();
+  //once the image loads, generate the ssssterogram
   imageElement.onload = () => {
-    console.log("image load event");
+    //console.log("image load event");
+
+    //generate the stereogram - populates the magicHashish 
     magicDust();
-    download();
+    //download();
     document.body.removeChild(imageElement);
+
+    //set the p5 magicImage source from the magicHashish canvas
+    magicImage = globalSK.loadImage(document.getElementById('magicHashish').toDataURL());
+    magicImage.loadPixels();
+
+    //hide the magicHashish div and start p5js
+    document.body.removeChild(magicCanvas);
   }
   document.body.removeChild( renderer.domElement );
-  //document.body.removeChild(imageElement);
-
-  //generate the stereogram
-  //magicDust();
-  //download();
 }
 
+//3) get the image from the stereogram canvas, and let p5js handle screen resize events.  This gets called from inside the bootstrap function
+const s = ( sk ) => {
 
-// threejs animation stuff
-function onWindowResize() {
+  //expand scope
+  globalSK = sk;
 
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
+  sk.setup = () => {
+    sk.createCanvas(sk.windowWidth, sk.windowHeight);
+    sk.imageMode(sk.CENTER);
+  }
 
-  renderer.setSize( window.innerWidth, window.innerHeight );
+  sk.draw = () => {
+    sk.background(0);
+    //if the height is less than the width * (magicHeight/magicWidth), then height should drive.  otherwise width drives
+    if (window.innerHeight < window.innerWidth * (magicHeight/magicWidth)) {
+      sk.image(magicImage, window.innerWidth/2, window.innerHeight/2, window.innerHeight * (magicWidth/magicHeight), window.innerHeight)
+    } else {
+      sk.image(magicImage, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerWidth * (magicHeight/magicWidth))
+    }
+    sk.noLoop()
+  }
 
-}
+  sk.windowResized = () => {
+    sk.resizeCanvas(sk.windowWidth, sk.windowHeight);
+    sk.loop()
+  }
+};
 
+
+//4) run p5, then the bootstrap
+let myp5 = new p5(s);
+bootstrapMagicMushroomStereogram();
+
+
+
+//threejs animate loop function - remains here along with orbitcontrols for dev and debugging
 function animate() {
-  
-
   controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
   requestAnimationFrame( animate );
   render();
 
 }
 
+//threejs render function - only called once to generate depthmap image
 function render() {
 
   controls.update();
@@ -189,14 +218,9 @@ function render() {
   //   loaded = true;
   // }
 
-  // if(previewed == false && loaded == true && renderer.info.render.frame > 100){
-  //   fxpreview();
-  //   previewed = true;
-  //   //download();
-  // } 
-
 }
 
+//download an image for review / debugging / feedback
 function download() {
   var link = document.createElement('a');
   link.download = 'MagicMushrooms.png';
@@ -204,8 +228,9 @@ function download() {
   link.click();
 }
 
+//generate stereogram image
 function magicDust() {
-  console.log("call stereogram")
+  //console.log("call stereogram")
 
   const imgMapper = new Stereogram.ImgDepthMapper(imageElement);
   const dm = imgMapper.generate(window.innerWidth, window.innerHeight);
