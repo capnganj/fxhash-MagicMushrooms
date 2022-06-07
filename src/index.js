@@ -17,8 +17,7 @@ window.$fxhashData = feet;
 // FX Features
 window.$fxhashFeatures = {
   "Palette" : feet.color.inverted ? feet.color.name + " Invert" : feet.color.name,
-  "Scale" : feet.scale.tag,
-  "Speed": feet.speed.tag,
+  "Size": feet.size.tag,
   "Density": feet.density.tag
 };
 console.log(window.$fxhashFeatures);
@@ -93,14 +92,14 @@ function bootstrapMagicMushroomStereogram() {
 
   //ellipse gives evenly spaced points for...
   const elle = new THREE.EllipseCurve(0,0, 2.2, 1.1, 0, Math.PI*2, false, 0);
-  const numShrooms = 13;
+  const numShrooms = feet.density.value;
   const basePointsOnXY = elle.getPoints(numShrooms)
   //MUSHROOMS!
   for (let i = 0; i < numShrooms; i++) {
     
     //cap
     const capWidth = feet.map(fxrand(), 0, 1, 0.3, 0.75);
-    const f = new MushroomCap(capWidth, feet.map(fxrand(), 0, 1, 0.2, 0.5)).fungualBufferGeometry;
+    const f = new MushroomCap(capWidth, feet.map(fxrand(), 0, 1, feet.size.smallValue, feet.size.bigValue)).fungualBufferGeometry;
     const mesh = new THREE.Mesh(f, m);
     
     const centerPoint = new THREE.Vector3(basePointsOnXY[i].x, feet.map(fxrand(), 0, 1, 0.1, 1.5), basePointsOnXY[i].y)

@@ -6,35 +6,17 @@ class Features {
 
         //color palette 
         this.color = {
-            name: "",
-            background: {},
-            cero: {},
-            uno: {},
-            dos: {},
-            tres: {},
-            quatro: {},
-            cinco: {},
-            sies:{},
-            siete: {}
+            name: ""
         };
         this.setColorPalette();
-        this.setColors();
 
-        //scale of vertex wigglers
-        this.scale = {
+        //drives how big the mushroom caps get
+        this.size = {
             tag: "",
-            value: 0.0,
-            dispValue: 0.0
+            smallValue: 0,
+            bigValue: 0
         }
-        this.setScale();
-
-        //drives how fast the wiggle and wave speeds roll
-        this.speed = {
-            tag: "",
-            vertexValue: 1.0,
-            fragmentValue: 1.0
-        }
-        this.setSpeed();
+        this.setSize();
 
         //drives bubble density in the textures generation
         this.density = {
@@ -135,13 +117,6 @@ class Features {
         }
     }
 
-    //desaturate by some %
-    desaturateColor(col, percent) {
-        //let h = hsl(col);
-        //h -= percent;
-        return col.darker(percent);
-    }
-
     //set color palette globally
     setColorPalette() {
         let c = fxrand();
@@ -190,76 +165,35 @@ class Features {
         }
     }
 
-    //set individual colors for background and shader
-    setColors() {
-        this.color.background = this.interpolateFn(this.map(fxrand(), 0, 1, 0.2, 0.8));
-        this.color.cero = this.interpolateFn(this.map(fxrand(), 0, 1, 0, 0.125));
-        this.color.uno = this.interpolateFn(this.map(fxrand(), 0, 1, 0, 0.25));
-        this.color.dos = this.interpolateFn(this.map(fxrand(), 0, 1, 0.25, 0.375));
-        this.color.tres = this.interpolateFn(this.map(fxrand(), 0, 1, 0.25, 0.5));
-        this.color.quatro = this.interpolateFn(this.map(fxrand(), 0, 1, 0.5, 0.625));
-        this.color.cinco = this.interpolateFn(this.map(fxrand(), 0, 1, 0.5, 0.75));
-        this.color.sies = this.interpolateFn(this.map(fxrand(), 0, 1, 0.75, 0.875));
-        this.color.siete = this.interpolateFn(this.map(fxrand(), 0, 1, 0.75, 1));
 
-        //invert 33%
-        if (fxrand() > 10) {
-            this.color.background = this.invertColor(this.color.background);
-            this.color.cero = this.invertColor(this.color.cero);
-            this.color.uno = this.invertColor(this.color.uno);
-            this.color.dos = this.invertColor(this.color.dos);
-            this.color.tres = this.invertColor(this.color.tres);
-            this.color.quatro = this.invertColor(this.color.quatro);
-            this.color.cinco = this.invertColor(this.color.cinco);
-            this.color.sies = this.invertColor(this.color.sies);
-            this.color.siete = this.invertColor(this.color.siete);
-            this.color.name += " Invert";
-        }
-    }
-
-    //set bump and texture scale
-    setScale() {
-        let s = fxrand();
-        if (s < 0.23) {
-            this.scale.tag = "Smooth";
-        }
-        else if (s < 0.57) {
-            this.scale.tag = "Low";
-        }
-        else {
-            this.scale.tag = "High";
-        }
-        this.scale.value = this.map(s, 0, 1, 1.0, 3.0);
-        this.scale.dispValue = this.map(s, 0, 1, 0.125, 0.25);
-    }
 
     //set vertex and fragment speeds
-    setSpeed(){
+    setSize(){
         let s = fxrand();
         if (s < 0.44) {
-            this.speed.tag = "Slow";
+            this.size.tag = "Mini";
         }
         else if (s < 0.61) {
-            this.speed.tag = "Steady";
+            this.size.tag = "Small";
         }
         else if (s < 0.88) {
-            this.speed.tag = "Fast";
+            this.size.tag = "Big";
         }
         else{
-            this.speed.tag = "Zippy"
+            this.size.tag = "Huge"
         }
-        this.speed.vertexValue = this.map(s, 0, 1, 0.25, 0.75);
-        this.speed.fragmentValue = this.map(s, 0, 1, 0.25, 1.75);
+        this.size.smallValue = this.map(s, 0, 1, 0.15, 0.25);
+        this.size.bigValue = this.map(s, 0, 1, 0.3, 0.7);
     }
 
-    //set texture density
+    //set fungus density -- how many should we draw?
     setDensity(){
         let d = fxrand();
         if (d < 0.33) {
             this.density.tag = "Sparse";
         }
         else if (d < 0.55) {
-            this.density.tag = "Even";
+            this.density.tag = "Nice";
         }
         else if (d < 0.88) {
             this.density.tag = "Dense";
@@ -267,7 +201,7 @@ class Features {
         else{
             this.density.tag = "Packed"
         }
-        this.density.value = parseInt(this.map(d, 0, 1, 10, 100));
+        this.density.value = parseInt(this.map(d, 0, 1, 7, 19));
     }
 }
 
