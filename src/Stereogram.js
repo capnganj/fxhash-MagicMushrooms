@@ -156,8 +156,18 @@ var Stereogram = {
         for (x = (width - 1); x >= 0; x--) {
           pixelOffset = (y * width * 4) + (x * 4);
           if (same[x] === x) {
+
+            //OG algorithm behavior:
             // set random color
-            rgba = opts.colors[Math.floor(Math.random() * numColors)];
+            //rgba = opts.colors[Math.floor(Math.random() * numColors)];
+
+            //CJ adjustment
+            //set semi-random color to make vertical gradients?
+            let heightRatio = y/height;
+            let heightRatioWithNoise = heightRatio + map(fxrand(), 0, 1, -0.9, 0.9);
+            let colorIndex = Math.round(map(heightRatioWithNoise, 0, 1, 1, numColors-1));
+            rgba = opts.colors[colorIndex];
+
             for (i = 0; i < 4; i++) {
               pixels[pixelOffset + i] = rgba[i];
             }
@@ -194,6 +204,13 @@ var Stereogram = {
       }
     }
 };
+
+var map = function(n, start1, stop1, start2, stop2) {
+    const newval = (n - start1) / (stop1 - start1) * (stop2 - start2) + start2;
+    if(newval <= start2) return start2;
+    if(newval >= stop2) return stop2;
+    return newval;
+}
 
 
 // -- DepthMapper --

@@ -183,12 +183,12 @@ const s = ( sk ) => {
     } else {
       sk.image(magicImage, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerWidth * (magicHeight/magicWidth))
     }
-    sk.noLoop()
+    //sk.noLoop()
   }
 
   sk.windowResized = () => {
     sk.resizeCanvas(sk.windowWidth, sk.windowHeight);
-    sk.loop()
+    //sk.loop()
   }
 };
 
@@ -236,8 +236,8 @@ function magicDust() {
   const dm = imgMapper.generate(window.innerWidth, window.innerHeight);
 
   Stereogram.render({
-    el: 'magicHashish',
-    colors: [feet.interpolateFn(0.05), feet.interpolateFn(0.5), feet.interpolateFn(0.95)],
+    el: 'magicHashish', 
+    colors: [feet.interpolateFn(0.05), feet.interpolateFn(0.25), feet.interpolateFn(0.5), feet.interpolateFn(0.75), feet.interpolateFn(0.95)].reverse(),
     depthMap: dm
     //depthMapper: new Stereogram.CanvasDepthMapper(threeCanvas)
     //depthMapper: new Stereogram.ImgDepthMapper(imageElement)
