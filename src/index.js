@@ -16,7 +16,7 @@ window.$fxhashData = feet;
 
 // FX Features
 window.$fxhashFeatures = {
-  "Palette" : feet.color.name,
+  "Palette" : feet.color.inverted ? feet.color.name + " Invert" : feet.color.name,
   "Scale" : feet.scale.tag,
   "Speed": feet.speed.tag,
   "Density": feet.density.tag
@@ -63,13 +63,6 @@ function bootstrapMagicMushroomStereogram() {
   document.body.appendChild( renderer.domElement );
   threeCanvas = renderer.domElement;
 
-  //image for the depthmapper to chew on - three generates this, and the image depthmapper seems to work better than the webgl2 canvas mapper
-  imageElement = document.createElement('img');
-  imageElement.id = "depthImage";
-  imageElement.width = magicWidth;
-  imageElement.height = magicHeight;
-  document.body.appendChild(imageElement);
-  
   //create a canvas for the magicmagic
   magicCanvas = document.createElement('canvas');
   magicCanvas.id = "magicHashish";
@@ -77,6 +70,13 @@ function bootstrapMagicMushroomStereogram() {
   magicCanvas.height = magicHeight;
   document.body.appendChild(magicCanvas);
 
+  //image for the depthmapper to chew on - three generates this, and the image depthmapper seems to work better than the webgl2 canvas mapper
+  imageElement = document.createElement('img');
+  imageElement.id = "depthImage";
+  imageElement.width = magicWidth;
+  imageElement.height = magicHeight;
+  document.body.appendChild(imageElement);
+  
 
   //threejs camera and orbitcontrols
   camera = new THREE.PerspectiveCamera( 60, magicWidth / magicHeight, 1.3, 10 );
@@ -87,16 +87,15 @@ function bootstrapMagicMushroomStereogram() {
 
   //material
   const m = new THREE.MeshDepthMaterial();
-  const n = new THREE.MeshNormalMaterial();
 
 
   //geometry
 
-  //ellipse gives evenly spaced points 
+  //ellipse gives evenly spaced points for...
   const elle = new THREE.EllipseCurve(0,0, 2.2, 1.1, 0, Math.PI*2, false, 0);
   const numShrooms = 13;
   const basePointsOnXY = elle.getPoints(numShrooms)
-
+  //MUSHROOMS!
   for (let i = 0; i < numShrooms; i++) {
     
     //cap
@@ -121,24 +120,13 @@ function bootstrapMagicMushroomStereogram() {
     scene.add(stemMesh);
   }
 
+  //diarama -- needed to not draw clear background
   const boxer = new THREE.BoxBufferGeometry(9,4,5.2);
   //flip normals
   boxer.applyMatrix4(new THREE.Matrix4().makeScale(-1,1,1));
   const boxMesh = new THREE.Mesh(boxer, m);
   boxMesh.position.set(0,1,0)
   scene.add(boxMesh);
-
-  const axis = new THREE.AxesHelper(1);
-  //scene.add(axis);
-
-  //set the background color 
-  let bod = document.body;
-  //bod.style.backgroundColor = 'white'
-  //bod.style.backgroundColor = feet.desaturateColor(feet.color.background, 1.5);
-
-  //set up resize listener and let it rip!
-  //window.addEventListener( 'resize', onWindowResize );
-  //animate();
 
   //render the first frame
   render();
@@ -155,16 +143,20 @@ function bootstrapMagicMushroomStereogram() {
     document.body.removeChild(imageElement);
 
     //set the p5 magicImage source from the magicHashish canvas
-    magicImage = globalSK.loadImage(document.getElementById('magicHashish').toDataURL());
+    magicImage = globalSK.loadImage(document.getElementById('magicHashish').toDataURL(), () => {
+      //p5 should now be drawing the stereogram image -- call preview
+      fxpreview();
+    });
     magicImage.loadPixels();
 
-    //hide the magicHashish div and start p5js
+    //hide the magicHashish canvas
     document.body.removeChild(magicCanvas);
   }
+  //hide the threejs canvas
   document.body.removeChild( renderer.domElement );
 }
 
-//3) get the image from the stereogram canvas, and let p5js handle screen resize events.  This gets called from inside the bootstrap function
+//3) snag the image from the stereogram canvas, and let p5js handle screen resize events.  This gets called from inside the bootstrap function
 const s = ( sk ) => {
 
   //expand scope
@@ -193,7 +185,7 @@ const s = ( sk ) => {
 };
 
 
-//4) run p5, then the bootstrap
+//4) start p5, then run the bootstrapper.  Once the image is ready, p5 will draw it 
 let myp5 = new p5(s);
 bootstrapMagicMushroomStereogram();
 
@@ -230,16 +222,14 @@ function download() {
 
 //generate stereogram image
 function magicDust() {
-  //console.log("call stereogram")
 
   const imgMapper = new Stereogram.ImgDepthMapper(imageElement);
   const dm = imgMapper.generate(window.innerWidth, window.innerHeight);
+  const colors = [feet.interpolateFn(0.05), feet.interpolateFn(0.25), feet.interpolateFn(0.5), feet.interpolateFn(0.75), feet.interpolateFn(0.95)];
 
   Stereogram.render({
     el: 'magicHashish', 
-    colors: [feet.interpolateFn(0.05), feet.interpolateFn(0.25), feet.interpolateFn(0.5), feet.interpolateFn(0.75), feet.interpolateFn(0.95)].reverse(),
+    colors: feet.color.inverted ? colors : colors.reverse(),
     depthMap: dm
-    //depthMapper: new Stereogram.CanvasDepthMapper(threeCanvas)
-    //depthMapper: new Stereogram.ImgDepthMapper(imageElement)
   });
 }

@@ -1,4 +1,4 @@
-import { interpolateCool, interpolateInferno, interpolateMagma, interpolateWarm, interpolateViridis } from 'd3-scale-chromatic'
+import { interpolateYlOrRd, interpolateInferno, interpolateMagma, interpolatePuBuGn, interpolatePlasma, interpolateRdPu, interpolateViridis, interpolateCividis, interpolateYlGnBu, interpolateYlGn, interpolateYlOrBr } from 'd3-scale-chromatic'
 import { rgb, hsl, color } from 'd3-color';
 
 class Features {
@@ -52,15 +52,50 @@ class Features {
 
     //color palette interpolation
     interpolateFn(val) {
+        let col;
         switch (this.color.name) {
-            case "Cool": return rgb(interpolateCool(val)).formatHex();
-            case "Warm": return rgb(interpolateWarm(val)).formatHex();
-            case "Viridis": return rgb(interpolateViridis(val)).formatHex();
-            case "Magma": return rgb(interpolateMagma(val)).formatHex();
-            case "Inferno": return rgb(interpolateInferno(val)).formatHex();
+            case "Ylorrd": 
+                col = rgb(interpolateYlOrRd(1-val)).formatHex();
+                break
+            case "Rdpu": 
+                col = rgb(interpolateRdPu(1-val)).formatHex();
+                break;
+            case "Viridis": 
+                col = rgb(interpolateViridis(val)).formatHex();
+                break;
+            case "Magma": 
+                col = rgb(interpolateMagma(val)).formatHex();
+                break;
+            case "Inferno": 
+                col = rgb(interpolateInferno(val)).formatHex();
+                break;
+            case "Plasma": 
+                col = rgb(interpolatePlasma(val)).formatHex();
+                break;
+            case "Cividis": 
+                col = rgb(interpolateCividis(val)).formatHex();
+                break;
+            case "Ylgn":
+                col = rgb(interpolateYlGn(1-val)).formatHex();
+                break;
+            case "Ylgnbu":
+                col = rgb(interpolateYlGnBu(1-val)).formatHex();
+                break;
+            case "Pubugn":
+                col = rgb(interpolatePuBuGn(1-val)).formatHex();
+                break;
+            case "Ylorbr":
+                col = rgb(interpolateYlOrBr(1-val)).formatHex();
+                break;
             default:
-                return "high"
+                col = rgb(interpolateMagma(val)).formatHex();
         }
+
+        if (this.color.inverted) {
+            col = this.invertColor(col) 
+        }
+
+        return col;
     }
 
     //color inverter
@@ -90,7 +125,7 @@ class Features {
         g = (255 - g).toString(16);
         b = (255 - b).toString(16);
         // pad each with zeros and return
-        let inverted = color("#" + padZero(r) + padZero(g) + padZero(b)).rgb();
+        let inverted = color("#" + padZero(r) + padZero(g) + padZero(b)).rgb().formatHex();
         return inverted;
 
         function padZero(str, len) {
@@ -111,20 +146,47 @@ class Features {
     setColorPalette() {
         let c = fxrand();
 
-        if (c < 0.15) {
-            this.color.name = "Warm"
+        //set palette
+
+        
+        if (c < 0.07) { //1
+            this.color.name = "Ylorrd"
         }
-        else if (c < 0.25) {
-            this.color.name = "Cool"
+        else if (c < 0.14) { //2
+            this.color.name = "Rdpu"
         }
-        else if (c < 0.5) {
-            this.color.name = "Viridis"
+        else if (c < 0.21) { //3
+            this.color.name = "Ylgn"
         }
-        else if (c < 0.7) {
-            this.color.name = "Magma"
+        else if (c < 0.28) {  //4
+            this.color.name = "Pubugn"
         }
-        else {
-            this.color.name = "Inferno"
+        else if (c < 0.35) { //5
+            this.color.name = "Ylgnbu"
+        }
+        else if (c < 0.44) { //6
+            this.color.name = "Viridis" 
+        }
+        else if (c < 0.55) {  //7
+            this.color.name = "Inferno" 
+        }
+        else if (c < 0.66) {  //8
+            this.color.name = "Plasma" 
+        }
+        else if (c < 0.77) {  //9
+            this.color.name = "Cividis" 
+        }
+        else if (c < 0.88) {  //11
+            this.color.name = "Ylorbr" 
+        }
+        //...
+        else {  //11
+            this.color.name = "Magma"  
+        }
+
+        //inverted?
+        if( fxrand() > 0.777 ) {
+            this.color.inverted = true;
         }
     }
 
