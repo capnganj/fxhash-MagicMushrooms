@@ -136,6 +136,9 @@ function bootstrapMagicMushroomStereogram() {
   imageElement.onload = () => {
     //console.log("image load event");
 
+    //start p5
+    let myp5 = new p5(s);
+
     //generate the stereogram - populates the magicHashish 
     magicDust();
     //download();
@@ -185,7 +188,7 @@ const s = ( sk ) => {
 
 
 //4) start p5, then run the bootstrapper.  Once the image is ready, p5 will draw it 
-let myp5 = new p5(s);
+//let myp5 = new p5(s);
 bootstrapMagicMushroomStereogram();
 
 
