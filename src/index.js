@@ -167,15 +167,17 @@ const s = ( sk ) => {
   sk.setup = () => {
     sk.createCanvas(sk.windowWidth, sk.windowHeight);
     sk.imageMode(sk.CENTER);
+    sk.drawingContext.shadowColor = 'rgba(33,33,33, 0.66)';
+    sk.drawingContext.shadowBlur = 33;
   }
 
   sk.draw = () => {
-    sk.background(0);
+    sk.background(235, 213, 179);
     //if the height is less than the width * (magicHeight/magicWidth), then height should drive.  otherwise width drives
     if (window.innerHeight < window.innerWidth * (magicHeight/magicWidth)) {
-      sk.image(magicImage, window.innerWidth/2, window.innerHeight/2, window.innerHeight * (magicWidth/magicHeight), window.innerHeight)
+      sk.image(magicImage, window.innerWidth/2, window.innerHeight*0.485, (window.innerHeight * 0.85) * (magicWidth/magicHeight), (window.innerHeight * 0.85))
     } else {
-      sk.image(magicImage, window.innerWidth/2, window.innerHeight/2, window.innerWidth, window.innerWidth * (magicHeight/magicWidth))
+      sk.image(magicImage, window.innerWidth/2, window.innerHeight*0.485, (window.innerWidth * 0.85), (window.innerWidth * 0.85) * (magicHeight/magicWidth))
     }
     //sk.noLoop()
   }
