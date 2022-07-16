@@ -20,7 +20,7 @@ window.$fxhashFeatures = {
   "Size": feet.size.tag,
   "Density": feet.density.tag
 };
-console.log(window.$fxhashFeatures);
+//console.log(window.$fxhashFeatures);
 //console.log(feet);
 
 //vars related to fxhash preview call
@@ -148,6 +148,7 @@ function bootstrapMagicMushroomStereogram() {
     magicImage = globalSK.loadImage(document.getElementById('magicHashish').toDataURL(), () => {
       //p5 should now be drawing the stereogram image -- call preview
       fxpreview();
+      //download();
     });
     magicImage.loadPixels();
 
@@ -167,17 +168,17 @@ const s = ( sk ) => {
   sk.setup = () => {
     sk.createCanvas(sk.windowWidth, sk.windowHeight);
     sk.imageMode(sk.CENTER);
-    sk.drawingContext.shadowColor = 'rgba(33,33,33, 0.66)';
-    sk.drawingContext.shadowBlur = 33;
+    sk.drawingContext.shadowColor = 'rgba(33,33,33, 0.33)';
+    sk.drawingContext.shadowBlur = 20;
   }
 
   sk.draw = () => {
     sk.background(235, 213, 179);
     //if the height is less than the width * (magicHeight/magicWidth), then height should drive.  otherwise width drives
     if (window.innerHeight < window.innerWidth * (magicHeight/magicWidth)) {
-      sk.image(magicImage, window.innerWidth/2, window.innerHeight*0.485, (window.innerHeight * 0.85) * (magicWidth/magicHeight), (window.innerHeight * 0.85))
+      sk.image(magicImage, window.innerWidth/2, window.innerHeight*0.48, (window.innerHeight * 0.85) * (magicWidth/magicHeight), (window.innerHeight * 0.85))
     } else {
-      sk.image(magicImage, window.innerWidth/2, window.innerHeight*0.485, (window.innerWidth * 0.85), (window.innerWidth * 0.85) * (magicHeight/magicWidth))
+      sk.image(magicImage, window.innerWidth/2, window.innerHeight*0.48, (window.innerWidth * 0.85), (window.innerWidth * 0.85) * (magicHeight/magicWidth))
     }
     //sk.noLoop()
   }
@@ -219,9 +220,13 @@ function render() {
 //download an image for review / debugging / feedback
 function download() {
   var link = document.createElement('a');
-  link.download = 'MagicMushrooms.png';
+  link.download = 'MagicMushroomsDepthMap.png';
   link.href = document.getElementById('depthImage').src
   link.click();
+  var link2 = document.createElement('a');
+  link2.download = 'MagicMushroomsRender.png';
+  link2.href = document.getElementById('magicHashish').toDataURL()
+  link2.click();
 }
 
 //generate stereogram image
